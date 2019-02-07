@@ -22,7 +22,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="appVersion">v1.8.2</string>
+    <string name="appVersion">v1.8.3</string>
 
     <string-array name="filter_ubications_array">
         <item>CASINO</item>

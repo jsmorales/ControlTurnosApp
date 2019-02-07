@@ -20,6 +20,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:padding="20sp"
         android:orientation="vertical">
 
         <LinearLayout
@@ -32,7 +33,7 @@
                 android:id="@+id/textInputSocialLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="50dp"
+                android:paddingTop="20dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:hint="Número de Cédula">
@@ -48,17 +49,21 @@
 
             <Button
                 android:id="@+id/consultaButton"
-                android:layout_width="243dp"
-                android:layout_height="50sp"
-                android:layout_marginStart="65sp"
-                android:text="Consultar..." />
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="0sp"
+                android:background="@color/colorPrimaryDark"
+                android:textStyle="bold"
+                android:textColor="#fff"
+                android:textSize="20sp"
+                android:text="Consultar" />
 
         </LinearLayout>
 
         <!--gone-->
         <LinearLayout
             android:id="@+id/resultadoLayout"
-            android:layout_marginTop="5sp"
+            android:layout_marginTop="7sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
