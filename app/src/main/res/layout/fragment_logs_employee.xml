@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backgroundDark"
+    tools:context=".Fragments.LogsEmployeeFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/logContentItem"
+        android:padding="13dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="0dp">
+
+            <TextView
+                android:id="@+id/nameAgentTurnTextView"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Juan Camilo Molina"
+                style="@style/recentLogsTitle"
+                android:layout_width="match_parent" />
+
+            <TextView
+                android:id="@+id/socialNumberTextView"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/recentLogsTitle"
+                android:text="1023860663" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/logListRecyclerView"
+        android:layout_marginTop="70sp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</FrameLayout>

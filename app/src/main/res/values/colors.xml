@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#007bff</color>
+    <color name="colorPrimaryDark">#0058b7</color>
+    <color name="colorAccent">#dc3545</color>
+    <color name="recentLogSuccess">#c3e6cb</color>
+    <color name="recentLogFontSuccess">#155724</color>
+    <color name="recentLogFail">#f5c6cb</color>
+    <color name="recentLogFontFail">#721c24</color>
+    <color name="backgroudLight">#f8f9fa</color>
+    <color name="backgroundDark">#7e8285</color>
+</resources>
