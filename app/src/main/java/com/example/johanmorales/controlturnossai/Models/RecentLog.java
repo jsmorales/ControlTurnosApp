@@ -13,6 +13,8 @@ public class RecentLog implements Parcelable {
     public String arrivingTime;
     public Integer controlAgent;
     public String detail;
+    private Integer dateDiff;
+
 
     public RecentLog(Parcel in) {
         if (in.readByte() == 0) {
@@ -31,6 +33,11 @@ public class RecentLog implements Parcelable {
             controlAgent = in.readInt();
         }
         detail = in.readString();
+        if (in.readByte() == 0) {
+            dateDiff = null;
+        } else {
+            dateDiff = in.readInt();
+        }
     }
 
     public static final Creator<RecentLog> CREATOR = new Creator<RecentLog>() {
@@ -113,6 +120,14 @@ public class RecentLog implements Parcelable {
         this.detail = detail;
     }
 
+    public Integer getDateDiff() {
+        return dateDiff;
+    }
+
+    public void setDateDiff(Integer dateDiff) {
+        this.dateDiff = dateDiff;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -138,5 +153,11 @@ public class RecentLog implements Parcelable {
             dest.writeInt(controlAgent);
         }
         dest.writeString(detail);
+        if (dateDiff == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(dateDiff);
+        }
     }
 }

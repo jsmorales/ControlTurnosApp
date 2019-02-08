@@ -72,6 +72,31 @@
             android:layout_weight="0">
 
             <TextView
+                android:id="@+id/titleDateDiffTextView"
+                android:layout_weight="1"
+                style="@style/recentLogsTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Retardo:" />
+
+            <TextView
+                android:id="@+id/dateDiffTextView"
+                android:layout_weight="1"
+                android:textColor="#fff"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="00:00" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="0dp"
+            android:layout_weight="0">
+
+            <TextView
                 android:id="@+id/titleDetailTextView"
                 android:layout_weight="1"
                 style="@style/recentLogsTitle"

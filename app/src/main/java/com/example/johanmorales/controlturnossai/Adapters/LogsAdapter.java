@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.example.johanmorales.controlturnossai.Models.RecentLog;
 import com.example.johanmorales.controlturnossai.R;
 import com.example.johanmorales.controlturnossai.utils.FormatDateUtil;
+import com.example.johanmorales.controlturnossai.utils.TimeConverter;
 
 import java.util.ArrayList;
 
@@ -54,6 +55,8 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.MyViewHolder> 
 
         myViewHolder.recentLogContentItem.setBackgroundResource(recentObjt.isAbleToEnter() ? R.color.recentLogSuccess : R.color.recentLogFail);
 
+        myViewHolder.dateDiffTextView.setText(TimeConverter.getMinsConverted(recentObjt.getDateDiff()));
+
         this.setStylesUI(recentObjt.isAbleToEnter, myViewHolder);
     }
 
@@ -65,6 +68,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.MyViewHolder> 
         myViewHolder.arrivingTimeTextView.setTextColor(ableToEnter ? colorSuccess : colorFail);
         myViewHolder.agentTurnTextView.setTextColor(ableToEnter ? colorSuccess : colorFail);
         myViewHolder.detailTextView.setTextColor(ableToEnter ? colorSuccess : colorFail);
+        myViewHolder.dateDiffTextView.setTextColor(ableToEnter ? colorSuccess : colorFail);
     }
 
     @Override
@@ -79,6 +83,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.MyViewHolder> 
         public TextView arrivingTimeTextView;
         public TextView detailTextView;
         public LinearLayout recentLogContentItem;
+        public TextView dateDiffTextView;
 
         //2. se autocompleta el constructor
         public MyViewHolder(@NonNull View itemView) {
@@ -89,7 +94,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.MyViewHolder> 
             arrivingTimeTextView = itemView.findViewById(R.id.arrivingTimeTextView);
             detailTextView = itemView.findViewById(R.id.detailTextView);
             recentLogContentItem = itemView.findViewById(R.id.recentLogContentItem);
-
+            dateDiffTextView = itemView.findViewById(R.id.dateDiffTextView);
         }
     }
 

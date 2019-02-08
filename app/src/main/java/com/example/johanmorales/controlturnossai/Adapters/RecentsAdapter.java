@@ -172,6 +172,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.MyViewHo
                                     recentLog.setAgentTurn(logJson.getString("agentTurn"));
                                     recentLog.setAbleToEnter(logJson.getBoolean("isAbleToEnter"));
                                     recentLog.setDetail(logJson.getString("detail"));
+                                    recentLog.setDateDiff(logJson.getInt("dateDiff"));
 
                                     //Log.d(TAG, recentLog.getName());
 
