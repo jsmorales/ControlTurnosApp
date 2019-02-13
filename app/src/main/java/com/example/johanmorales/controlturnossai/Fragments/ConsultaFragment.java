@@ -13,6 +13,7 @@ import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -119,35 +120,48 @@ public class ConsultaFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                String socialNumber = socialNumberTextInput.getText().toString();
-
-                Log.d(TAG, "Social number: "+socialNumber);
-
-                // Check for a valid password, if the user entered one.
-                if (TextUtils.isEmpty(socialNumber)) {
-
-                    socialNumberTextInput.setError(getString(R.string.error_field_required));
-                    socialNumberTextInput.requestFocus();
-
-                } else {
-
-                    consultar(socialNumber);
-                }
+                getSocialNumberAndExec();
 
             }
         });
 
-        /*socialNumberTextInput.setOnClickListener(new View.OnClickListener() {
+        /*lectura honeywell*/
+        socialNumberTextInput.setOnKeyListener(new View.OnKeyListener() {
             @Override
-            public void onClick(View v) {
-                //show the keyboard
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
 
-                socialNumberTextInput.setInputType(InputType.TYPE_CLASS_NUMBER);
+                Log.d(TAG, "Event: "+event.getAction());
+                Log.d(TAG, "keycode: "+keyCode);
 
+                if(event.getAction() == 1 && keyCode == 0){
+
+                    getSocialNumberAndExec();
+                }
+
+                return false;
             }
-        });*/
+        });
 
         return view;
+    }
+
+    public void getSocialNumberAndExec(){
+
+        String socialNumber = socialNumberTextInput.getText().toString();
+
+        Log.d(TAG, "Social number: "+socialNumber);
+
+        // Check for a valid password, if the user entered one.
+        if (TextUtils.isEmpty(socialNumber)) {
+
+            socialNumberTextInput.setError(getString(R.string.error_field_required));
+            socialNumberTextInput.requestFocus();
+
+        } else {
+
+            consultar(socialNumber);
+            socialNumberTextInput.requestFocus();
+        }
     }
 
     public void consultar(String socialNumber){

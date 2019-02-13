@@ -2,6 +2,8 @@ package com.example.johanmorales.controlturnossai;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -30,6 +33,7 @@ import com.example.johanmorales.controlturnossai.Models.Respuesta;
 import com.example.johanmorales.controlturnossai.Models.Resultado;
 import com.example.johanmorales.controlturnossai.Models.UtilsMainApp;
 import com.example.johanmorales.controlturnossai.utils.Md5Manager;
+import com.example.johanmorales.controlturnossai.utils.VersionGetUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -51,6 +55,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     private View mLoginFormView;
     private Spinner mFilterUbicationSpinner;
     private ImageView logoInit;
+    private TextView versionTextView;
 
 
     public String user;
@@ -74,6 +79,8 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         mPasswordView = findViewById(R.id.password);
         mFilterUbicationSpinner = findViewById(R.id.filterUbicationSpinner);
         logoInit = findViewById(R.id.logoInit);
+
+        versionTextView = findViewById(R.id.versionTextView);
 
         //fill the spinner
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.filter_ubications_array, android.R.layout.simple_spinner_item);
@@ -112,6 +119,26 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        //---------------------------------------------------------------------------------------
+        //VersionGetUtil version = new VersionGetUtil(this);
+
+        versionTextView.setText(getVersion());
+        //---------------------------------------------------------------------------------------
+    }
+
+    public String getVersion(){
+
+        String version = "";
+
+        try {
+            PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
+            version = pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return version;
     }
 
 
