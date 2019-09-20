@@ -128,7 +128,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
 
     public String getVersion(){
 
-        String version = "";
+        String version = "-";
 
         try {
             PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
