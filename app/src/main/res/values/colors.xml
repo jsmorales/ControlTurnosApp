@@ -9,4 +9,12 @@
     <color name="recentLogFontFail">#721c24</color>
     <color name="backgroudLight">#f8f9fa</color>
     <color name="backgroundDark">#7e8285</color>
+    <color name="backServicesItem">#30343F</color>
+    <color name="backPanelControls">#D7D9D7</color>
+    <!-- status service colors -->
+    <color name="progressColor">#06D6A0</color>
+    <color name="standByColor">#FDCA40</color>
+    <color name="finishedColor">#33A1FD</color>
+    <color name="requestedColor">#9D69A3</color>
+    <color name="normalColor">#fff</color>
 </resources>

@@ -2,6 +2,8 @@ package com.example.johanmorales.controlturnossai;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -49,14 +52,14 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
-    private Spinner mFilterUbicationSpinner;
+    //private Spinner mFilterUbicationSpinner;
     private ImageView logoInit;
-
 
     public String user;
     public String password;
     public String region = REGION;
-    public String filterUbication;
+    public TextView versionTextView;
+    //public String filterUbication;
 
 
     public Respuesta respuesta;
@@ -72,15 +75,17 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         // Set up the login form.
         mEmailView = findViewById(R.id.email);
         mPasswordView = findViewById(R.id.password);
-        mFilterUbicationSpinner = findViewById(R.id.filterUbicationSpinner);
+        //mFilterUbicationSpinner = findViewById(R.id.filterUbicationSpinner);
         logoInit = findViewById(R.id.logoInit);
+
+        versionTextView = findViewById(R.id.versionTextView);
 
         //fill the spinner
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.filter_ubications_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mFilterUbicationSpinner.setAdapter(adapter);
+        //mFilterUbicationSpinner.setAdapter(adapter);
         //set the listeners
-        mFilterUbicationSpinner.setOnItemSelectedListener(this);
+        //mFilterUbicationSpinner.setOnItemSelectedListener(this);
 
         //define endpoint
         //---------------------------------------------------------------------------------------
@@ -112,6 +117,22 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        versionTextView.setText(getVersion());
+    }
+
+    public String getVersion(){
+
+        String version = "";
+
+        try {
+            PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
+            version = pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return version;
     }
 
 
@@ -150,16 +171,20 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
             focusView = mEmailView;
             focusView.requestFocus();
 
-        }else  if(TextUtils.isEmpty(filterUbication)){
-
-            mPasswordView.setError("Debe seleccionar una ubicación.");
-
-        } else{
+        } else {
 
             password = Md5Manager.encode(pass);
 
-            login(user, password, region, filterUbication);
+            login(user, password, region);
         }
+
+        /**
+         * if(TextUtils.isEmpty(filterUbication)){
+         *
+         *  mPasswordView.setError("Debe seleccionar una ubicación.");
+         *
+         *} else
+         * */
 
     }
 
@@ -176,7 +201,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         }
     }
 
-    private void login(String user, String password, String region, final String filterUbication){
+    private void login(String user, String password, String region){
 
         //Log.d(TAG,"Se pasaron los parámetros user: "+user+" y pass: "+password);
 
@@ -231,7 +256,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                             empleado.setLastName(employee.getString("lastName"));
                             empleado.setPosition(employee.getString("position"));
                             empleado.setRegion(employee.getString("region"));
-                            empleado.setFilterUbication(filterUbication);
+                            //empleado.setFilterUbication(filterUbication);
                             //---------------------------------------------------
 
                             resultado.setToken(result.getString("token"));
@@ -323,9 +348,8 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-        Log.d(TAG, "Se ha seleccionado: "+parent.getItemAtPosition(position).toString());
-
-        filterUbication = parent.getItemAtPosition(position).toString();
+        //Log.d(TAG, "Se ha seleccionado: "+parent.getItemAtPosition(position).toString());
+        //filterUbication = parent.getItemAtPosition(position).toString();
     }
 
     @Override

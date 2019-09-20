@@ -6,7 +6,7 @@ import android.os.Parcelable;
 public class UtilsMainApp implements Parcelable {
 
     public String hostProduction = "https://control-llegada-backend.azurewebsites.net/";
-    public String hostTest = "https://control-llegada-backend-test.azurewebsites.net/";
+    public String hostTest = "https://control-llegada-backend-dev.azurewebsites.net/";
     public String hostAuth = "https://sai-auth.azurewebsites.net/api/authentication";
     public Integer numTouch = 6;
     public Integer touched = 0;

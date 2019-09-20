@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity
 
     public TextView userNameTextViewToolBar;
     public TextView positionTextViewToolBar;
-    public TextView filterUbicationTextViewToolBar;
     public View consultaProgressMain;
 
     public Respuesta respuesta;
@@ -83,7 +82,6 @@ public class MainActivity extends AppCompatActivity
         View hView =  navigationView.getHeaderView(0);
         userNameTextViewToolBar = hView.findViewById(R.id.userNameTextViewToolBar);
         positionTextViewToolBar = hView.findViewById(R.id.positionTextViewToolBar);
-        filterUbicationTextViewToolBar = hView.findViewById(R.id.filterUbicationTextViewToolBar);
         //------------------------------------------------------
 
 
@@ -97,7 +95,7 @@ public class MainActivity extends AppCompatActivity
             Log.d(TAG,  "respuesta sigue: "+respuesta.getMessage());
             Log.d(TAG,  "resultado sigue: "+resultado.getToken());
             Log.d(TAG,  "empleado sigue: "+empleado.getFirstName());
-            Log.d(TAG,  "empleado filterUbication: "+empleado.getFilterUbication());
+            //Log.d(TAG,  "empleado filterUbication: "+empleado.getFilterUbication());
 
             Log.d(TAG,  "url que debe ejecutar: "+urls.getHost());
 
@@ -105,7 +103,7 @@ public class MainActivity extends AppCompatActivity
 
             userNameTextViewToolBar.setText(name);
             positionTextViewToolBar.setText(empleado.getPosition());
-            filterUbicationTextViewToolBar.setText(empleado.getFilterUbication());
+            //filterUbicationTextViewToolBar.setText(empleado.getFilterUbication());
 
             //initialize main fragment
             initMainFragment();
@@ -280,7 +278,7 @@ public class MainActivity extends AppCompatActivity
 
         RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
 
-        String urlApi = urls.getHost().concat("api/recentLogs");
+        String urlApi = urls.getHost().concat("api/recentLogs?token=" + resultado.getToken());
 
         JSONObject req = new JSONObject();
 
