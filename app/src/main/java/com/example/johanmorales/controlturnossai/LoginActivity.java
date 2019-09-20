@@ -33,6 +33,7 @@ import com.example.johanmorales.controlturnossai.Models.Respuesta;
 import com.example.johanmorales.controlturnossai.Models.Resultado;
 import com.example.johanmorales.controlturnossai.Models.UtilsMainApp;
 import com.example.johanmorales.controlturnossai.utils.Md5Manager;
+import com.example.johanmorales.controlturnossai.utils.VersionGetUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,11 +55,11 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     private View mLoginFormView;
     //private Spinner mFilterUbicationSpinner;
     private ImageView logoInit;
+    private TextView versionTextView;
 
     public String user;
     public String password;
     public String region = REGION;
-    public TextView versionTextView;
     //public String filterUbication;
 
 
@@ -118,7 +119,11 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
+        //---------------------------------------------------------------------------------------
+        //VersionGetUtil version = new VersionGetUtil(this);
+
         versionTextView.setText(getVersion());
+        //---------------------------------------------------------------------------------------
     }
 
     public String getVersion(){

@@ -55,8 +55,6 @@ public class LogsEmployeeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-
-
         //se instancia el layout en donde va a aparecer
         View view = inflater.inflate(R.layout.fragment_logs_employee, container, false);
 

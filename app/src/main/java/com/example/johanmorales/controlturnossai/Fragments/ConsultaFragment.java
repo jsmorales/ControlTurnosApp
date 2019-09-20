@@ -148,20 +148,7 @@ public class ConsultaFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                String socialNumber = socialNumberTextInput.getText().toString();
-
-                Log.d(TAG, "Social number: "+socialNumber);
-
-                // Check for a valid password, if the user entered one.
-                if (TextUtils.isEmpty(socialNumber)) {
-
-                    socialNumberTextInput.setError(getString(R.string.error_field_required));
-                    socialNumberTextInput.requestFocus();
-
-                } else {
-
-                    consultar(socialNumber);
-                }
+                getSocialNumberAndExec();
 
             }
         });
