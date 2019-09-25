@@ -170,6 +170,14 @@ public class ConsultaFragment extends Fragment {
             }
         });
 
+        socialNumberTextInput.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                Log.d(TAG, "onFocusChange: " + hasFocus);
+                //KeyboardUtils.hideKeyboard(Objects.requireNonNull(getActivity()));
+            }
+        });
+
         return view;
     }
 
@@ -286,53 +294,20 @@ public class ConsultaFragment extends Fragment {
 
                                 JSONObject result = response.getJSONObject("result");
 
-                                nameVerificationTextView.setText(result.getString("name"));
+                                Log.d(TAG, "onResponse: " + res.getBoolean("success"));
 
-                                validationTextView.setText(result.getBoolean("validation") ? "Puede Ingresar" : "No puede Ingresar");
-
-                                if(result.getBoolean("validation")){
-                                    resultadoLayout.setBackgroundResource(R.color.recentLogSuccess);
-                                }else{
-                                    resultadoLayout.setBackgroundResource(R.color.recentLogFail);
-                                }
-
-                                //notificactions
-                                JSONArray not = result.getJSONArray("notifications");
-
-                                notificationsTextView.setText("");
-
-                                if(not.length() > 0){
-
-                                    notificationsTextView.append("Notificaciones:\n");
-
-                                    for(int i = 0; i < not.length(); i++){
-
-                                        JSONObject notification = (JSONObject) not.get(i);
-
-                                        notificationsTextView.append((i+1)+". "+notification.getString("message")+"\n");
-                                    }
-                                }
-
-                                detailTextView.setText(result.getString("detail"));
-
-
-                                turnTextViewpublic.setText(result.getString("turn"));
-
-                                setStylesUI(result.getBoolean("validation"));
+                                setContentValidation(result, "", true);
 
                                 //exect alertDialog
-                                showAlertDialogResult(result);
+                                //showAlertDialogResult(result);
 
                             }else{
-                                Toast.makeText(getContext(), res.getString("message"), Toast.LENGTH_SHORT).show();
 
-                                nameVerificationTextView.setText("-");
+                                JSONObject result = new JSONObject();
 
-                                validationTextView.setText("-");
+                                Log.d(TAG, "onResponse: " + res.getString("message"));
 
-                                detailTextView.setText("-");
-
-                                turnTextViewpublic.setText("-");
+                                setContentValidation(result, res.getString("message"), false);
                             }
 
                         } catch (JSONException e) {
@@ -364,6 +339,76 @@ public class ConsultaFragment extends Fragment {
         // Add the request to the RequestQueue.
         queue.add(jsonObjectRequest);
     }/**/
+
+    public void setContentValidation(JSONObject result, String message, boolean type){
+
+        if(type) {
+            try {
+                nameVerificationTextView.setText(result.getString("name"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                validationTextView.setText(result.getBoolean("validation") ? "Puede Ingresar" : "No puede Ingresar");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                if(result.getBoolean("validation")){
+                    resultadoLayout.setBackgroundResource(R.color.recentLogSuccess);
+                }else{
+                    resultadoLayout.setBackgroundResource(R.color.recentLogFail);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                detailTextView.setText(result.getString("detail"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+                detailTextView.setText("-");
+            }
+            try {
+                turnTextViewpublic.setText(result.getString("turn"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                setStylesUI(result.getBoolean("validation"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            //notificactions
+            JSONArray not = null;
+            try {
+                not = result.getJSONArray("notifications");
+                notificationsTextView.setText("");
+                if(not.length() > 0){
+                    notificationsTextView.append("Notificaciones:\n");
+                    for(int i = 0; i < not.length(); i++){
+                        JSONObject notification = (JSONObject) not.get(i);
+                        notificationsTextView.append((i+1)+". "+notification.getString("message")+"\n");
+                    }
+                } else {
+                    notificationsTextView.setText("-");
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }else{
+            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+            resultadoLayout.setBackgroundResource(R.color.recentLogFail);
+            nameVerificationTextView.setText("-");
+            validationTextView.setText("-");
+            detailTextView.setText("-");
+            turnTextViewpublic.setText("-");
+            notificationsTextView.setText("-");
+            setStylesUI(false);
+        }
+
+    }
 
     public void showAlertDialogResult(JSONObject result){
 
