@@ -28,6 +28,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.johanmorales.controlturnossai.Events.CloseIncomeRecentsFragment;
 import com.example.johanmorales.controlturnossai.Fragments.ConsultaFragment;
 import com.example.johanmorales.controlturnossai.Fragments.IncomeRecentsFragment;
 import com.example.johanmorales.controlturnossai.Models.Employee;
@@ -38,6 +39,7 @@ import com.example.johanmorales.controlturnossai.Models.UtilsMainApp;
 import com.example.johanmorales.controlturnossai.utils.ConnectivityReceiver;
 import com.example.johanmorales.controlturnossai.utils.MyApplication;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -239,19 +241,9 @@ public class MainActivity extends AppCompatActivity
 
         }else if (id == R.id.nav_consultar){
 
-            initMainFragment();
-
-        } /*else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }*/
+            //initMainFragment();
+            EventBus.getDefault().post(new CloseIncomeRecentsFragment());
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -278,7 +270,7 @@ public class MainActivity extends AppCompatActivity
 
         RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
 
-        String urlApi = urls.getHost().concat("api/recentLogs?token=" + resultado.getToken());
+        String urlApi = urls.getHost().concat("api/recentLogs?token=" + resultado.getToken() + "&logsCount=50");
 
         JSONObject req = new JSONObject();
 
@@ -344,6 +336,8 @@ public class MainActivity extends AppCompatActivity
                             incomeRecentsFragment.setArguments(bundle);
                             //se añade la transaccion
                             fragmentTransaction.add(R.id.contentMain, incomeRecentsFragment, INCOME_RECENTS_FRAGMENT_TAG);
+                            //para poder regresar
+                            fragmentTransaction.addToBackStack(null);
                             //se realiza la transacción
                             fragmentTransaction.commit();
 

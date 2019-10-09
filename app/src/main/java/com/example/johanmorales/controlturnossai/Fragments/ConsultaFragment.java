@@ -8,6 +8,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.SharedElementCallback;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
@@ -33,10 +34,15 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.johanmorales.controlturnossai.Events.UbicationSelectedEvent;
 import com.example.johanmorales.controlturnossai.MainActivity;
+import com.example.johanmorales.controlturnossai.Models.CheckArrivingResponse;
 import com.example.johanmorales.controlturnossai.Models.Employee;
+import com.example.johanmorales.controlturnossai.Models.NotificationResultCheckArriving;
+import com.example.johanmorales.controlturnossai.Models.ResultCheckArriving;
 import com.example.johanmorales.controlturnossai.Models.Resultado;
 import com.example.johanmorales.controlturnossai.Models.Ubication;
 import com.example.johanmorales.controlturnossai.Models.UtilsMainApp;
+import com.example.johanmorales.controlturnossai.Network.RetrofitInstance;
+import com.example.johanmorales.controlturnossai.NetworkCalls.PostArrivingCheck;
 import com.example.johanmorales.controlturnossai.R;
 import com.example.johanmorales.controlturnossai.utils.FormatDateUtil;
 import com.example.johanmorales.controlturnossai.utils.KeyboardUtils;
@@ -51,6 +57,9 @@ import org.json.JSONObject;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Objects;
+
+import retrofit2.Call;
+import retrofit2.Callback;
 
 import static android.support.v4.content.ContextCompat.getSystemService;
 
@@ -67,7 +76,7 @@ public class ConsultaFragment extends Fragment {
     public View consultaForm;
     public View resultadoLayout;
 
-    public TextView nameVerificationTextView;
+    public TextView nameVerificationTextView, socialNumberVerificationTextView;
     public TextView validationTextView;
     public TextView detailTextView;
     public TextView turnTextViewpublic;
@@ -125,6 +134,7 @@ public class ConsultaFragment extends Fragment {
         //------------------------------------------------------
         //bind result layout
         nameVerificationTextView = view.findViewById(R.id.nameVerificationTextView);
+        socialNumberVerificationTextView = view.findViewById(R.id.socialNumberVerificationTextView);
         validationTextView = view.findViewById(R.id.validationTextView);
         detailTextView = view.findViewById(R.id.detailTextView);
         turnTextViewpublic = view.findViewById(R.id.turnTextView);
@@ -178,6 +188,21 @@ public class ConsultaFragment extends Fragment {
             }
         });
 
+        //filterUbication for default
+
+        if (filterUbicationObject == null) {
+
+            Log.d(TAG, "filterUbicationObject is null.");
+
+            filterUbicationObject = new Ubication();
+            filterUbicationObject.setAirport("BOG");
+            filterUbicationObject.setId("1");
+            filterUbicationObject.setPosition("CRUJIA SUR");
+
+            valueUbicationTextView.setText(String.format("%s", filterUbicationObject.getPosition()));
+
+        }
+
         return view;
     }
 
@@ -190,7 +215,7 @@ public class ConsultaFragment extends Fragment {
         // Check for a valid password, if the user entered one.
         if (validateFormRequest()) {
 
-            consultar(socialNumber); //TODO: change for the new method to post the new data.
+            checkArriving(socialNumber); //TODO: change for the new method to post the new data.
             socialNumberTextInput.requestFocus();
 
         }
@@ -244,170 +269,129 @@ public class ConsultaFragment extends Fragment {
         valueUbicationTextView.setText(String.format("%s", filterUbicationObject.getPosition()));
     }
 
-    public void consultar(String socialNumber){
+    public void checkArriving(String socialNumber) {
 
         consulta_progress.setVisibility(View.VISIBLE);
         consultaForm.setVisibility(View.GONE);
         resultadoLayout.setVisibility(View.GONE);
 
-        RequestQueue queue = Volley.newRequestQueue(getContext());
+        RetrofitInstance retroInstance = new RetrofitInstance(urls.getHost());
 
-        String urlApi = urls.getHost().concat("api/checkArriving?token="+resultado.getToken());
+        PostArrivingCheck postArrivingCheck = retroInstance.getRetrofitInstance().create(PostArrivingCheck.class);
 
-        JSONObject req = new JSONObject();
+        Call<CheckArrivingResponse> call = postArrivingCheck.postArrivingCheck(resultado.getToken(), socialNumber, filterUbicationObject.getPosition());
 
-        try {
-            req.put("socialNumber",socialNumber);
-            req.put("filterUbication",filterUbicationObject.getPosition());
-            //req.put("token",resultado.getToken());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        call.enqueue(new Callback<CheckArrivingResponse>() {
+            @Override
+            public void onResponse(Call<CheckArrivingResponse> call, retrofit2.Response<CheckArrivingResponse> response) {
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.POST, urlApi, req, new Response.Listener<JSONObject>() {
+                consulta_progress.setVisibility(View.GONE);
+                consultaForm.setVisibility(View.VISIBLE);
+                resultadoLayout.setVisibility(View.VISIBLE);
 
-                    @Override
-                    public void onResponse(final JSONObject response) {
+                socialNumberTextInput.setText("");
+                //socialNumberTextInput.requestFocus();
 
-                        //executeResponseJsonApp(response);
+                Log.d(TAG, "onResponse success: " + response.isSuccessful());
+                
+                if( response.isSuccessful() ) {
 
-                        //hide the keyboard------------------------------------------------
-                        //KeyboardUtils.hideKeyboard(getActivity());
-                        //-----------------------------------------------------------------
+                    Log.d(TAG, "onResponse: " + response.body().getMessage());
+                    Log.d(TAG, "onResponse: " + response.body().isSuccess());
+                    Log.d(TAG, "onResponse: " + response.body().getResult());
 
+                    //{"result":{"socialNumber":"79736546","name":"JHON JAIRO ARDILA OCHOA","agentPosition":"OPERARIO EQUIPOS","validation":false,"detail":"Por fuera del rango de tiempo","filterUbication":"CRUJIA SUR","turn":"17:00","ubication":"","notifications":[{"message":"mensaje de prueba 1"},{"message":"mensaje de test 2"}]}}
 
-                        consulta_progress.setVisibility(View.GONE);
-                        consultaForm.setVisibility(View.VISIBLE);
-                        resultadoLayout.setVisibility(View.VISIBLE);
+                    ResultCheckArriving result = response.body().getResult();
 
-                        socialNumberTextInput.setText("");
-                        socialNumberTextInput.clearFocus();
+                    if (response.body().isSuccess()) {
 
-                        JSONObject res = response;
+                        Log.d(TAG, "onResponseResult: " + result.getName());
 
-                        Log.d(TAG, "Status de la respuesta: " + res.toString());
+                        //TODO: execute the method to validate content
 
-                        try {
+                        validateContent(result, "", true);
 
-                            if(res.getBoolean("success")) {
+                    } else {
 
-                                JSONObject result = response.getJSONObject("result");
-
-                                Log.d(TAG, "onResponse: " + res.getBoolean("success"));
-
-                                setContentValidation(result, "", true);
-
-                                //exect alertDialog
-                                //showAlertDialogResult(result);
-
-                            }else{
-
-                                JSONObject result = new JSONObject();
-
-                                Log.d(TAG, "onResponse: " + res.getString("message"));
-
-                                setContentValidation(result, res.getString("message"), false);
-                            }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                        validateContent(result, "No se pudo validar el turno del agente.", false);
 
                     }
-                }, new Response.ErrorListener() {
 
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO: Handle error
+                } else {
+                    resultadoLayout.setVisibility(View.GONE);
+                    Log.d(TAG, "onResponse: " + response.raw());
+                    Toast.makeText(getContext(), "No se pudo verificar el número de cédula.", Toast.LENGTH_SHORT).show();
+                    //validateContent(result, "No se pudo validar el turno del agente.", false);
+                }
 
-                        Log.d(TAG, error.toString());
+            }
 
-                        consulta_progress.setVisibility(View.GONE);
+            @Override
+            public void onFailure(Call<CheckArrivingResponse> call, Throwable t) {
 
-                        //despliegue del error en un toast
-                        Toast.makeText(getContext(),error.toString(),Toast.LENGTH_LONG).show();
+                Log.d(TAG, t.getMessage());
 
-                    }
-                });
+                consulta_progress.setVisibility(View.GONE);
+                consultaForm.setVisibility(View.VISIBLE);
+                resultadoLayout.setVisibility(View.GONE);
+                socialNumberTextInput.setText("");
+                socialNumberTextInput.clearFocus();
 
-        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
-                MY_SOCKET_TIMEOUT_MS,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                //despliegue del error en un toast
+                Toast.makeText(getContext(),"Hubo un error del sistema. Por favor reporte este error al administrador.",Toast.LENGTH_LONG).show();
 
-        // Add the request to the RequestQueue.
-        queue.add(jsonObjectRequest);
-    }/**/
+            }
+        });
+    }
 
-    public void setContentValidation(JSONObject result, String message, boolean type){
+    public void validateContent(ResultCheckArriving result, String message, boolean type) {
 
         if(type) {
-            try {
-                nameVerificationTextView.setText(result.getString("name"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            try {
-                validationTextView.setText(result.getBoolean("validation") ? "Puede Ingresar" : "No puede Ingresar");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            try {
-                if(result.getBoolean("validation")){
-                    resultadoLayout.setBackgroundResource(R.color.recentLogSuccess);
-                }else{
-                    resultadoLayout.setBackgroundResource(R.color.recentLogFail);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            try {
-                detailTextView.setText(result.getString("detail"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-                detailTextView.setText("-");
-            }
-            try {
-                turnTextViewpublic.setText(result.getString("turn"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            try {
-                setStylesUI(result.getBoolean("validation"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
 
-            //notificactions
-            JSONArray not = null;
-            try {
-                not = result.getJSONArray("notifications");
-                notificationsTextView.setText("");
-                if(not.length() > 0){
+            socialNumberVerificationTextView.setText(result.getSocialNumber());
+            nameVerificationTextView.setText(result.getName());
+            validationTextView.setText(result.isValidation() ? "Puede Ingresar" : "No puede Ingresar");
+            if (result.isValidation()) {
+                resultadoLayout.setBackgroundResource(R.color.recentLogSuccess);
+            } else {
+                resultadoLayout.setBackgroundResource(R.color.recentLogFail);
+            }
+            detailTextView.setText(result.getDetail());
+            turnTextViewpublic.setText(result.getTurn());
+            setStylesUI(result.isValidation());
+
+            ArrayList<NotificationResultCheckArriving> not = null;
+            not = result.getNotifications();
+
+            notificationsTextView.setText("");
+
+            if(not != null) {
+
+                if (not.size() > 0) {
                     notificationsTextView.append("Notificaciones:\n");
-                    for(int i = 0; i < not.length(); i++){
-                        JSONObject notification = (JSONObject) not.get(i);
-                        notificationsTextView.append((i+1)+". "+notification.getString("message")+"\n");
+                    for (int i = 0; i < not.size(); i++) {
+                        //JSONObject notification = (JSONObject) not.get(i);
+                        notificationsTextView.append((i + 1) + ". " + not.get(i).getMessage() + "\n");
                     }
                 } else {
                     notificationsTextView.setText("-");
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
+
             }
 
-        }else{
+        } else {
+
             Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
             resultadoLayout.setBackgroundResource(R.color.recentLogFail);
             nameVerificationTextView.setText("-");
+            socialNumberVerificationTextView.setText("-");
             validationTextView.setText("-");
             detailTextView.setText("-");
             turnTextViewpublic.setText("-");
             notificationsTextView.setText("-");
             setStylesUI(false);
         }
-
     }
 
     public void showAlertDialogResult(JSONObject result){
@@ -483,6 +467,7 @@ public class ConsultaFragment extends Fragment {
         int colorFail = ContextCompat.getColor(getContext(), R.color.recentLogFontFail);
 
         nameVerificationTextView.setTextColor(ableToEnter ? colorSuccess : colorFail);
+        socialNumberVerificationTextView.setTextColor(ableToEnter ? colorSuccess : colorFail);
         validationTextView.setTextColor(ableToEnter ? colorSuccess : colorFail);
         detailTextView.setTextColor(ableToEnter ? colorSuccess : colorFail);
         turnTextViewpublic.setTextColor(ableToEnter ? colorSuccess : colorFail);
@@ -591,7 +576,7 @@ public class ConsultaFragment extends Fragment {
         // bundle.putParcelable("service", service);
         bundle.putParcelableArrayList("arrayUbications", arrayUbications);
 
-        fragmentManager = getActivity().getSupportFragmentManager(); //((AppCompatActivity) context).getSupportFragmentManager();
+        fragmentManager = Objects.requireNonNull(getActivity()).getSupportFragmentManager(); //((AppCompatActivity) context).getSupportFragmentManager();
         // ChangeStatusServiceFragment savedServicesFragment = (ServicesFragment) fragmentManager.findFragmentByTag(SERVICES_FRAGMENT_TAG);
         fragmentTransaction = fragmentManager.beginTransaction();
 
@@ -605,5 +590,6 @@ public class ConsultaFragment extends Fragment {
 
         fragmentTransaction.commit();
     }
+
 
 }

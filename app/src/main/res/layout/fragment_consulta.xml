@@ -4,8 +4,7 @@
     android:id="@+id/fragmentConsultaContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tool="http://schemas.android.com/apk/res-auto"
-    android:background="#b9b8b8"
+    android:background="@drawable/background_normal_fade"
     tools:context=".Fragments.ConsultaFragment">
 
     <ProgressBar
@@ -136,7 +135,7 @@
                         android:id="@+id/turnTextViewLabel"
                         android:layout_marginTop="10sp"
                         android:layout_marginLeft="8dp"
-                        android:textSize="20dp"
+                        android:textSize="18dp"
                         android:layout_weight="4"
                         android:textColor="@color/backgroudLight"
                         android:textStyle="bold"
@@ -148,8 +147,32 @@
                         android:id="@+id/turnTextView"
                         android:layout_marginTop="10sp"
                         android:layout_marginLeft="8dp"
-                        android:textSize="20dp"
-                        android:layout_weight="1"
+                        android:textSize="18dp"
+                        android:layout_weight="4"
+                        android:textColor="@color/backgroudLight"
+                        android:textStyle="bold"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="-" />
+
+                    <TextView
+                        android:id="@+id/socialNumberTextViewLabel"
+                        android:layout_marginTop="10sp"
+                        android:layout_marginLeft="8dp"
+                        android:textSize="18dp"
+                        android:layout_weight="4"
+                        android:textColor="@color/backgroudLight"
+                        android:textStyle="bold"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="CC" />
+
+                    <TextView
+                        android:id="@+id/socialNumberVerificationTextView"
+                        android:layout_marginTop="10sp"
+                        android:layout_marginLeft="8dp"
+                        android:textSize="18dp"
+                        android:layout_weight="3"
                         android:textColor="@color/backgroudLight"
                         android:textStyle="bold"
                         android:layout_width="match_parent"

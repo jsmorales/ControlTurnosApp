@@ -4,45 +4,63 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/backgroundDark"
+    android:orientation="vertical"
     tools:context=".Fragments.LogsEmployeeFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/logContentItem"
-        android:padding="13dp"
+        android:padding="5dp"
+        android:background="@drawable/background_normal_fade"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="0dp">
+            android:layout_marginTop="0dp"
+            android:padding="8dp"
+            android:background="@color/colorPrimary"
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/nameAgentTurnTextView"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="Juan Camilo Molina"
-                style="@style/recentLogsTitle"
-                android:layout_width="match_parent" />
+            <Button
+                android:id="@+id/buttonIcSignal"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginRight="5dp"
+                android:backgroundTint="@color/normalColor"
+                android:background="@drawable/ic_user_assign"/>
 
             <TextView
                 android:id="@+id/socialNumberTextView"
-                android:layout_weight="1"
-                android:layout_width="match_parent"
+                style="@style/headerTitleFragment"
+                android:textSize="12dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                style="@style/recentLogsTitle"
-                android:text="1023860663" />
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textColor="@color/normalColor"
+                android:text="-" />
+
+            <TextView
+                android:id="@+id/nameAgentTurnTextView"
+                style="@style/headerTitleFragment"
+                android:textSize="12dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:gravity="center"
+                android:textColor="@color/normalColor"
+                android:text="-" />
 
         </LinearLayout>
 
-    </LinearLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/logListRecyclerView"
+            android:layout_marginTop="10sp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/logListRecyclerView"
-        android:layout_marginTop="70sp"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    </LinearLayout>
 
 </FrameLayout>

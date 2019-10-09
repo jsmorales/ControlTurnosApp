@@ -3,7 +3,7 @@
     xmlns:tool="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:padding="13dp"
+    android:padding="5dp"
     android:layout_height="wrap_content">
     <!-- red color #721c24-->
 
@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:id="@+id/recentLogContentItem"
         tool:background="#155724"
-        android:padding="13dp"
+        android:padding="5dp"
         android:orientation="vertical">
 
         <LinearLayout
@@ -158,9 +158,9 @@
                 android:layout_height="30dp"
                 android:layout_weight="1"
                 android:textSize="14sp"
-                android:text="Ver Logs"
+                android:text="Detalle"
                 android:textColor="#fff"
-                android:background="@color/backgroundDark"/>
+                android:background="@drawable/button_info"/>
 
 
         </LinearLayout>
