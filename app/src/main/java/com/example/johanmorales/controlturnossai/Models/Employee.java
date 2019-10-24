@@ -3,12 +3,18 @@ package com.example.johanmorales.controlturnossai.Models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Employee implements Parcelable {
 
-    private String firstName;
-    private String lastName;
-    private String position;
-    private String region;
+    @SerializedName("firstName")
+    public String firstName;
+    @SerializedName("lastName")
+    public String lastName;
+    @SerializedName("position")
+    public String position;
+    @SerializedName("region")
+    public String region;
     private String filterUbication;
 
 

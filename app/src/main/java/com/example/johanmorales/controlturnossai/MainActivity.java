@@ -29,12 +29,14 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.johanmorales.controlturnossai.Events.CloseIncomeRecentsFragment;
+import com.example.johanmorales.controlturnossai.Events.UbicationSelectedEvent;
 import com.example.johanmorales.controlturnossai.Fragments.ConsultaFragment;
 import com.example.johanmorales.controlturnossai.Fragments.IncomeRecentsFragment;
 import com.example.johanmorales.controlturnossai.Models.Employee;
 import com.example.johanmorales.controlturnossai.Models.RecentLog;
 import com.example.johanmorales.controlturnossai.Models.Respuesta;
 import com.example.johanmorales.controlturnossai.Models.Resultado;
+import com.example.johanmorales.controlturnossai.Models.Ubication;
 import com.example.johanmorales.controlturnossai.Models.UtilsMainApp;
 import com.example.johanmorales.controlturnossai.utils.ConnectivityReceiver;
 import com.example.johanmorales.controlturnossai.utils.MyApplication;
@@ -153,6 +155,15 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void closeSession(){
+
+        //reset the ubication to crujia sur--------------------------------------------
+        Ubication filterUbicationObject;
+        filterUbicationObject = new Ubication();
+        filterUbicationObject.setId("1");
+        filterUbicationObject.setPosition("CRUJIA SUR");
+        filterUbicationObject.setAirport("BOG");
+        EventBus.getDefault().post(new UbicationSelectedEvent(filterUbicationObject));
+        //------------------------------------------------------------------------------
 
         respuesta = null;
 

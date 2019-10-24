@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.example.johanmorales.controlturnossai.Events.CloseAssignUbicationFragment;
 import com.example.johanmorales.controlturnossai.Events.UbicationSelectedEvent;
+import com.example.johanmorales.controlturnossai.Handler.MyDBHandler;
 import com.example.johanmorales.controlturnossai.Models.Resultado;
 import com.example.johanmorales.controlturnossai.Models.Ubication;
 import com.example.johanmorales.controlturnossai.Models.UtilsMainApp;

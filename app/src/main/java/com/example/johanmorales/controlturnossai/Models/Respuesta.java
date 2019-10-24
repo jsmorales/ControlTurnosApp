@@ -3,11 +3,16 @@ package com.example.johanmorales.controlturnossai.Models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Respuesta implements Parcelable {
 
-    private Boolean succes;
-    private String message;
-    private Resultado result;
+    @SerializedName("success")
+    public Boolean succes;
+    @SerializedName("message")
+    public String message;
+    @SerializedName("result")
+    public Resultado result;
 
 
     public Respuesta(Parcel in) {

@@ -1,25 +1,19 @@
 package com.example.johanmorales.controlturnossai.Fragments;
 
-import android.content.Context;
 import android.content.DialogInterface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.SharedElementCallback;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -33,7 +27,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.johanmorales.controlturnossai.Events.UbicationSelectedEvent;
-import com.example.johanmorales.controlturnossai.MainActivity;
+import com.example.johanmorales.controlturnossai.Handler.MyDBHandler;
 import com.example.johanmorales.controlturnossai.Models.CheckArrivingResponse;
 import com.example.johanmorales.controlturnossai.Models.Employee;
 import com.example.johanmorales.controlturnossai.Models.NotificationResultCheckArriving;
@@ -44,8 +38,6 @@ import com.example.johanmorales.controlturnossai.Models.UtilsMainApp;
 import com.example.johanmorales.controlturnossai.Network.RetrofitInstance;
 import com.example.johanmorales.controlturnossai.NetworkCalls.PostArrivingCheck;
 import com.example.johanmorales.controlturnossai.R;
-import com.example.johanmorales.controlturnossai.utils.FormatDateUtil;
-import com.example.johanmorales.controlturnossai.utils.KeyboardUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -54,14 +46,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
-
-import static android.support.v4.content.ContextCompat.getSystemService;
 
 
 public class ConsultaFragment extends Fragment {
@@ -98,6 +89,8 @@ public class ConsultaFragment extends Fragment {
     public TextView valueUbicationTextView;
     public static final String ASSIGN_UBICATIONS_TAG = "AssignUbicationsFragment";
 
+    public MyDBHandler dbHandler;
+
     public ConsultaFragment() {
         // Required empty public constructor
     }
@@ -115,6 +108,7 @@ public class ConsultaFragment extends Fragment {
 
         Log.d(TAG,resultado.getToken());
         Log.d(TAG, "Se debe ejecutar: "+urls.getHost());
+
     }
 
     @Override
@@ -188,21 +182,6 @@ public class ConsultaFragment extends Fragment {
             }
         });
 
-        //filterUbication for default
-
-        if (filterUbicationObject == null) {
-
-            Log.d(TAG, "filterUbicationObject is null.");
-
-            filterUbicationObject = new Ubication();
-            filterUbicationObject.setAirport("BOG");
-            filterUbicationObject.setId("1");
-            filterUbicationObject.setPosition("CRUJIA SUR");
-
-            valueUbicationTextView.setText(String.format("%s", filterUbicationObject.getPosition()));
-
-        }
-
         return view;
     }
 
@@ -254,6 +233,25 @@ public class ConsultaFragment extends Fragment {
     public void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
+
+        //-----------------------------------------------------------------------------------------
+        //filterUbication for default
+        dbHandler = new MyDBHandler(getContext(),null,null, 1);
+
+        if(filterUbicationObject == null){
+            if(dbHandler.loadUbicationList().size() > 0){
+                filterUbicationObject = dbHandler.loadUbicationList().get(0);
+                Log.d(TAG, "size of ubications: " + dbHandler.loadUbicationList().size());
+                Log.d(TAG, "ub null - size > 0 : " + filterUbicationObject.getId()+ filterUbicationObject.getPosition() + filterUbicationObject.getAirport());
+            }else {
+                filterUbicationObject = new Ubication();
+                filterUbicationObject.setId("1");
+                filterUbicationObject.setPosition("CRUJIA SUR");
+                filterUbicationObject.setAirport("BOG");
+            }
+            EventBus.getDefault().post(new UbicationSelectedEvent(filterUbicationObject));
+        }
+        //-----------------------------------------------------------------------------------------
     }
 
     @Override
@@ -265,15 +263,26 @@ public class ConsultaFragment extends Fragment {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(UbicationSelectedEvent ubicationSelectedEvent) {
         filterUbicationObject = ubicationSelectedEvent.getUbication();
+        //Add ubication if not exists-------------------------------------------
+        Ubication ubUpdate = filterUbicationObject;
+        ubUpdate.setId("1");
+
+        if(dbHandler.loadUbicationList().size() == 0){
+            Log.d(TAG, "onMessageEvent: no hay ninguna ubicación");
+            dbHandler.addHandler(ubUpdate);
+        }else {
+            Log.d(TAG, "onMessageEvent: si hay ubicaciones - update");
+            Log.d(TAG, "ub to update: " + ubUpdate.getId()+ ubUpdate.getPosition() + ubUpdate.getAirport());
+            dbHandler.updateHandler(ubUpdate.getId(), ubUpdate.getPosition(), ubUpdate.getAirport());
+        }
+        //----------------------------------------------------------------------
         Toast.makeText(getContext(), "Ubicación " + filterUbicationObject.getPosition() + " seleccionado.", Toast.LENGTH_SHORT).show();
         valueUbicationTextView.setText(String.format("%s", filterUbicationObject.getPosition()));
     }
 
     public void checkArriving(String socialNumber) {
 
-        consulta_progress.setVisibility(View.VISIBLE);
-        consultaForm.setVisibility(View.GONE);
-        resultadoLayout.setVisibility(View.GONE);
+        changeLayoutValidationLoad(true);
 
         RetrofitInstance retroInstance = new RetrofitInstance(urls.getHost());
 
@@ -285,12 +294,7 @@ public class ConsultaFragment extends Fragment {
             @Override
             public void onResponse(Call<CheckArrivingResponse> call, retrofit2.Response<CheckArrivingResponse> response) {
 
-                consulta_progress.setVisibility(View.GONE);
-                consultaForm.setVisibility(View.VISIBLE);
-                resultadoLayout.setVisibility(View.VISIBLE);
-
-                socialNumberTextInput.setText("");
-                //socialNumberTextInput.requestFocus();
+                changeLayoutValidationLoad(false);
 
                 Log.d(TAG, "onResponse success: " + response.isSuccessful());
                 
@@ -298,9 +302,7 @@ public class ConsultaFragment extends Fragment {
 
                     Log.d(TAG, "onResponse: " + response.body().getMessage());
                     Log.d(TAG, "onResponse: " + response.body().isSuccess());
-                    Log.d(TAG, "onResponse: " + response.body().getResult());
-
-                    //{"result":{"socialNumber":"79736546","name":"JHON JAIRO ARDILA OCHOA","agentPosition":"OPERARIO EQUIPOS","validation":false,"detail":"Por fuera del rango de tiempo","filterUbication":"CRUJIA SUR","turn":"17:00","ubication":"","notifications":[{"message":"mensaje de prueba 1"},{"message":"mensaje de test 2"}]}}
+                    //Log.d(TAG, "onResponse: " + response.body().getResult().getDetail());
 
                     ResultCheckArriving result = response.body().getResult();
 
@@ -343,6 +345,29 @@ public class ConsultaFragment extends Fragment {
 
             }
         });
+    }
+
+    private void changeLayoutValidationLoad(boolean loading) {
+
+        if (loading) {
+            consulta_progress.setVisibility(View.VISIBLE);
+            consultaForm.setVisibility(View.GONE);
+            resultadoLayout.setVisibility(View.GONE);
+            socialNumberTextInput.setEnabled(false);
+            socialNumberTextInput.setFocusable(false);
+            socialNumberTextInput.clearFocus();
+        } else {
+            consulta_progress.setVisibility(View.GONE);
+            consultaForm.setVisibility(View.VISIBLE);
+            resultadoLayout.setVisibility(View.VISIBLE);
+
+            socialNumberTextInput.setText("");
+            socialNumberTextInput.setEnabled(true);
+            socialNumberTextInput.setFocusableInTouchMode(true);
+            socialNumberTextInput.setFocusable(true);
+            socialNumberTextInput.requestFocus();
+        }
+
     }
 
     public void validateContent(ResultCheckArriving result, String message, boolean type) {

@@ -3,10 +3,14 @@ package com.example.johanmorales.controlturnossai.Models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Resultado implements Parcelable {
 
-    private String token;
-    private Employee employee;
+    @SerializedName("token")
+    public String token;
+    @SerializedName("employee")
+    public Employee employee;
 
     public Resultado(Parcel in) {
         token = in.readString();

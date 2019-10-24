@@ -1,6 +1,5 @@
 package com.example.johanmorales.controlturnossai;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -13,30 +12,29 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.example.johanmorales.controlturnossai.Models.Employee;
 import com.example.johanmorales.controlturnossai.Models.Respuesta;
 import com.example.johanmorales.controlturnossai.Models.Resultado;
 import com.example.johanmorales.controlturnossai.Models.UtilsMainApp;
+import com.example.johanmorales.controlturnossai.Network.RetrofitInstance;
+import com.example.johanmorales.controlturnossai.NetworkCalls.PostAuthenticate;
+import com.example.johanmorales.controlturnossai.utils.JWTUtil;
 import com.example.johanmorales.controlturnossai.utils.Md5Manager;
-import com.example.johanmorales.controlturnossai.utils.VersionGetUtil;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
+
+import retrofit2.Call;
+import retrofit2.Callback;
 
 /**
  * A login screen that offers login via email/password.
@@ -180,7 +178,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
 
             password = Md5Manager.encode(pass);
 
-            login(user, password, region);
+            authenticate(user, password, region);
         }
 
         /**
@@ -206,116 +204,82 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         }
     }
 
-    private void login(String user, String password, String region){
+    private void authenticate(String user, String password, String region) {
 
-        //Log.d(TAG,"Se pasaron los parámetros user: "+user+" y pass: "+password);
+        changeLoadLayout(true);
 
-        mProgressView.setVisibility(View.VISIBLE);
-        mLoginFormView.setVisibility(View.GONE);
+        RetrofitInstance retroInstance = new RetrofitInstance(urls.getHostAuth());
 
-        RequestQueue queue = Volley.newRequestQueue(this);
+        PostAuthenticate postAuthenticate = retroInstance.getRetrofitInstance().create(PostAuthenticate.class);
 
-        String urlApi = urls.getHostAuth();
+        Call<Respuesta> call = postAuthenticate.authenticate(user, password, region);
 
-        JSONObject req = new JSONObject();
+        call.enqueue(new Callback<Respuesta>() {
+            @Override
+            public void onResponse(Call<Respuesta> call, retrofit2.Response<Respuesta> response) {
 
-        try {
-            req.put("username",user);
-            req.put("password",password);
-            req.put("region",region);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+                Log.d(TAG, "onResponse: " + response.body());
 
+                if (response.isSuccessful()) {
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.POST, urlApi, req, new Response.Listener<JSONObject>() {
+                    respuesta = response.body();
+                    resultado = response.body().getResult();
+                    empleado = response.body().getResult().getEmployee();
 
-                    //cuOfJs
+                    //Validation of permissions----------------------------------------------------------------------------------------------------------------------
+                    String decodedToken = JWTUtil.getDecodedJwt(resultado.getToken());
+                    try {
 
-                    @SuppressLint("SetTextI18n")
-                    @Override
-                    public void onResponse(final JSONObject response) {
+                        JSONObject decodedObject = new JSONObject(decodedToken);
+                        JSONArray permissionsArray = decodedObject.getJSONArray("permissions");
+                        Log.d(TAG, String.valueOf(JWTUtil.havePermissionRequested(permissionsArray, "CONTROL LLEGADA")));
 
-                        //executeResponseJsonApp(response);
-
-                        JSONObject res = response;
-
-                        Log.d(TAG,"Status de la respuesta: "+res.toString());
-
-                        respuesta = new Respuesta();
-                        resultado = new Resultado();
-                        empleado = new Employee();
-
-                        try {
-
-                            JSONObject result = (JSONObject) res.get("result");
-                            JSONObject employee = (JSONObject) result.get("employee");
-
-                            respuesta.setSucces(res.getBoolean("success"));
-                            respuesta.setMessage(res.getString("message"));
-
-                            //---------------------------------------------------
-
-                            empleado.setFirstName(employee.getString("firstName"));
-                            empleado.setLastName(employee.getString("lastName"));
-                            empleado.setPosition(employee.getString("position"));
-                            empleado.setRegion(employee.getString("region"));
-                            //empleado.setFilterUbication(filterUbication);
-                            //---------------------------------------------------
-
-                            resultado.setToken(result.getString("token"));
-                            resultado.setEmployee(empleado);
-
-                            respuesta.setResult(resultado);
-
-                            Log.d(TAG, "El mensaje de la respuesta es: "+respuesta.getMessage());
-
-                            Log.d(TAG,"token: "+resultado.getToken());
-                            //----------------------------------------------------
-                            /**
-                             *  Intent hourlyActivityIntent = new Intent(MainActivity.this,HourlyForecastActivity.class);
-                             *
-                             *  //en este intent se añade un extra llamado socialNumber con el valor de tipo int
-                             *  hourlyActivityIntent.putExtra("SocialNumber",1024524163);
-                             *
-                             *  hourlyActivityIntent.putParcelableArrayListExtra("hours",arrListHours);
-                             *
-                             *  startActivity(hourlyActivityIntent);
-                             * */
-
+                        if(JWTUtil.havePermissionRequested(permissionsArray, "CONTROL LLEGADA")){
                             initMainActivity();
-                            //----------------------------------------------------
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                        } else {
+                            changeLoadLayout(false);
+                            Toast.makeText(LoginActivity.this,"No tiene los permisos necesarios para acceder a la aplicación.",Toast.LENGTH_LONG).show();
                         }
 
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO: Handle error
-
-                        Log.d(TAG, error.toString());
-
-                        mProgressView.setVisibility(View.GONE);
-                        mLoginFormView.setVisibility(View.VISIBLE);
-
-                        //despliegue del error en un toast
-                        Toast.makeText(LoginActivity.this,getString(R.string.error_response)+": "+error.toString(),Toast.LENGTH_LONG).show();
-
+                    //------------------------------------------------------------------------------------------------------------------------------------------------
+                } else {
+                    changeLoadLayout(false);
+                    //response.
+                    try {
+                        //Log.d(TAG, "onResponse: " + response.errorBody().string());
+                        JSONObject errorResponse = new JSONObject(response.errorBody().string());
+                        Log.d(TAG, "onError --> " + errorResponse.getString("message"));
+                        Toast.makeText(LoginActivity.this, errorResponse.getString("message"), Toast.LENGTH_SHORT).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                });
+                }
 
-        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
-                MY_SOCKET_TIMEOUT_MS,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            }
 
-        // Add the request to the RequestQueue.
-        queue.add(jsonObjectRequest);
+            @Override
+            public void onFailure(Call<Respuesta> call, Throwable t) {
+                changeLoadLayout(false);
+                Toast.makeText(LoginActivity.this,getString(R.string.error_response)+": Error Server.",Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
+    private void changeLoadLayout(boolean loading) {
+
+        if (loading) {
+            mProgressView.setVisibility(View.VISIBLE);
+            mLoginFormView.setVisibility(View.GONE);
+        } else {
+            mProgressView.setVisibility(View.GONE);
+            mLoginFormView.setVisibility(View.VISIBLE);
+        }
     }
 
     private void initMainActivity(){
